@@ -3,8 +3,11 @@ import sys
 
 import pygame
 import requests
+coords = [134.457771, -28.069396]
+zoom = 4
+map_type = "sat"
+map_request = f"http://static-maps.yandex.ru/1.x/?ll={coords[0]},{coords[1]}&z={zoom}&l={map_type}"
 
-map_request = "http://static-maps.yandex.ru/1.x/?ll=134.457771,-28.069396&spn=25,25&l=sat"
 response = requests.get(map_request)
 
 if not response:
