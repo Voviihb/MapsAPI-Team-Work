@@ -3,16 +3,22 @@ import sys
 
 import pygame
 import requests
-coords = [134.457771, -28.069396]
-zoom = 4
-map_type = "sat"
-map_request = f"http://static-maps.yandex.ru/1.x/?ll={coords[0]},{coords[1]}&z={zoom}&l={map_type}"
 
-response = requests.get(map_request)
+coords = input("Введите координаты в формате xxx yyy: ").split()
+spn = input("Введите значение параметра spn(масштаб): ")
+map_params = {
+        "ll": ",".join([coords[1], coords[0]]),
+        "spn": ",".join([spn, spn]),
+        "l": "map"
+}
+
+
+map_api_server = "http://static-maps.yandex.ru/1.x/"
+response = requests.get(map_api_server, params=map_params)
 
 if not response:
     print("Ошибка выполнения запроса:")
-    print(map_request)
+    print(response.url)
     print("Http статус:", response.status_code, "(", response.reason, ")")
     sys.exit(1)
 
