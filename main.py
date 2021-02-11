@@ -27,13 +27,17 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                coords[1] = str(float(coords[1]) - 2 * float(spn))
+                if 0 < abs(float(coords[1]) - 2 * float(spn)) < 180:
+                    coords[1] = str(float(coords[1]) - 2 * float(spn))
             elif event.key == pygame.K_RIGHT:
-                coords[1] = str(float(coords[1]) + 2 * float(spn))
+                if 0 < abs(float(coords[1]) + 2 * float(spn)) < 180:
+                    coords[1] = str(float(coords[1]) + 2 * float(spn))
             elif event.key == pygame.K_UP:
-                coords[0] = str(float(coords[0]) + 2 * float(spn))
+                if abs(float(coords[0]) + 2 * float(spn)) < 90:
+                    coords[0] = str(float(coords[0]) + 2 * float(spn))
             elif event.key == pygame.K_DOWN:
-                coords[0] = str(float(coords[0]) - 2 * float(spn))
+                if abs(float(coords[0]) - 2 * float(spn)) < 90:
+                    coords[0] = str(float(coords[0]) - 2 * float(spn))
             elif event.key == pygame.K_PAGEUP:
                 if 0 < float(spn) - 0.5 * float(spn) < 90:
                     spn = str(float(spn) - 0.5 * float(spn))
@@ -47,7 +51,7 @@ while running:
         "l": "map"
     }
 
-    print(coords)
+    #print(coords, spn)
     response = requests.get(map_api_server, params=map_params)
     if not response:
         print("Ошибка выполнения запроса:")
