@@ -1,9 +1,11 @@
 import os
 import sys
-
 import pygame
 import requests
 
+from addons import Button
+
+map_type = "map"
 #coords = input("Введите координаты в формате xxx yyy: ").split()
 coords = ["-28.069396", "34.457771"]
 spn = "25"
@@ -11,14 +13,16 @@ spn = "25"
 map_params = {
         "ll": ",".join([coords[1], coords[0]]),
         "spn": ",".join([spn, spn]),
-        "l": "map"
+        "l": map_type
 }
 
 
 map_api_server = "http://static-maps.yandex.ru/1.x/"
 pygame.init()
-screen = pygame.display.set_mode((600, 450))
-
+screen = pygame.display.set_mode((800, 600))
+background_scheme_button = Button(170, 60, screen, pygame, active_clr=(255, 0, 0))
+background_sputnik_button = Button(170, 60, screen, pygame, active_clr=(255, 0, 0))
+background_hybrid_button = Button(170, 60, screen, pygame, active_clr=(255, 0, 0))
 running = True
 
 while running:
@@ -48,7 +52,7 @@ while running:
     map_params = {
         "ll": ",".join([coords[1], coords[0]]),
         "spn": ",".join([spn, spn]),
-        "l": "map"
+        "l": map_type
     }
 
     #print(coords, spn)
@@ -64,6 +68,12 @@ while running:
         file.write(response.content)
 
     screen.blit(pygame.image.load(map_file), (0, 0))
+    if background_scheme_button.draw((620, 20), "Схема"):
+        map_type = "map"
+    if background_sputnik_button.draw((620, 100), "Спутник"):
+        map_type = "sat"
+    if background_hybrid_button.draw((620, 180), "Гибрид"):
+        map_type = "sat,skl"
     pygame.display.flip()
 
     os.remove(map_file)
