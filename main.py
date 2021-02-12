@@ -3,12 +3,12 @@ import sys
 import pygame
 import requests
 
-from addons import Button
+from addons import Button, InputBox, get_full_address
 
 map_type = "map"
 #coords = input("Введите координаты в формате xxx yyy: ").split()
 coords = ["-28.069396", "34.457771"]
-spn = "25"
+spn = "10"
 #spn = input("Введите значение параметра spn(масштаб): ")
 map_params = {
         "ll": ",".join([coords[1], coords[0]]),
@@ -23,10 +23,16 @@ screen = pygame.display.set_mode((800, 600))
 background_scheme_button = Button(170, 60, screen, pygame, active_clr=(255, 0, 0))
 background_sputnik_button = Button(170, 60, screen, pygame, active_clr=(255, 0, 0))
 background_hybrid_button = Button(170, 60, screen, pygame, active_clr=(255, 0, 0))
-running = True
+search_button = Button(170, 60, screen, pygame, active_clr=(255, 255, 0))
+address_input_box = InputBox(pygame, 5, 460, 150, 32)
+address_input_box_done = False
 
+running = True
+x = y = 0
 while running:
+    screen.fill("black")
     for event in pygame.event.get():
+        address_input_box.handle_event(event)
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN:
@@ -49,12 +55,16 @@ while running:
                 if 0 < float(spn) + 0.5 * float(spn) < 90:
                     spn = str(float(spn) + 0.5 * float(spn))
 
+    address_input_box.update()
+    address_input_box.draw(screen)
+
     map_params = {
         "ll": ",".join([coords[1], coords[0]]),
         "spn": ",".join([spn, spn]),
-        "l": map_type
+        "l": map_type,
     }
-
+    if x:
+        map_params["pt"] = f"{y},{x},org"
     #print(coords, spn)
     response = requests.get(map_api_server, params=map_params)
     if not response:
@@ -74,6 +84,21 @@ while running:
         map_type = "sat"
     if background_hybrid_button.draw((620, 180), "Гибрид"):
         map_type = "sat,skl"
+    if search_button.draw((5, 500), "Искать!"):
+        address = address_input_box.return_text()
+        #print(address)
+        r = get_full_address(address)
+        x = (float(r["lowerCorner"].split()[1]) + float(r["upperCorner"].split()[1])) / 2
+        y = (float(r["lowerCorner"].split()[0]) + float(r["upperCorner"].split()[0])) / 2
+        print(x, y, r)
+        coords = [str(x), str(y)]
+        map_params = {
+            "ll": ",".join([str(y), str(x)]),
+            "spn": ",".join([spn, spn]),
+            "l": map_type,
+            "pt": f"{y},{x},org"
+        }
+
     pygame.display.flip()
 
     os.remove(map_file)

@@ -1,3 +1,6 @@
+import requests
+
+
 def print_text_from_center(message, x, y, screen, pygame, font_size=30):
     font = pygame.font.Font(None, font_size)
     string_rendered = font.render(message, 1, pygame.Color('black'))
@@ -78,3 +81,73 @@ class Button:
                     self.current_clr[i] = max(self.inactive_clr[i], self.current_clr[i] - self.diff_clr[i])
                 else:
                     self.current_clr[i] = min(self.inactive_clr[i], self.current_clr[i] - self.diff_clr[i])
+
+
+class InputBox:
+
+    def __init__(self, pygame, x, y, w, h, text=''):
+        self.pg = pygame
+        self.rect = pygame.Rect(x, y, w, h)
+        self.COLOR_INACTIVE = pygame.Color('lightskyblue3')
+        self.COLOR_ACTIVE = pygame.Color('dodgerblue2')
+        self.FONT = pygame.font.Font(None, 32)
+        self.color = self.COLOR_INACTIVE
+        self.text = text
+        self.txt_surface = self.FONT.render(text, True, self.color)
+        self.active = False
+
+    def handle_event(self, event):
+        if event.type == self.pg.MOUSEBUTTONDOWN:
+            # If the user clicked on the input_box rect.
+            if self.rect.collidepoint(event.pos):
+                # Toggle the active variable.
+                self.active = not self.active
+            else:
+                self.active = False
+            # Change the current color of the input box.
+            self.color = self.COLOR_ACTIVE if self.active else self.COLOR_INACTIVE
+        if event.type == self.pg.KEYDOWN:
+            if self.active:
+                if event.key == self.pg.K_RETURN:
+                    print(self.text)
+                    self.text = ''
+                elif event.key == self.pg.K_BACKSPACE:
+                    self.text = self.text[:-1]
+                else:
+                    self.text += event.unicode
+                # Re-render the text.
+                self.txt_surface = self.FONT.render(self.text, True, self.color)
+
+    def update(self):
+        # Resize the box if the text is too long.
+        width = max(200, self.txt_surface.get_width() + 10)
+        self.rect.w = width
+
+    def draw(self, screen):
+        # Blit the text.
+        screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 5))
+        # Blit the rect.
+        self.pg.draw.rect(screen, self.color, self.rect, 2)
+
+    def return_text(self):
+        t = self.text
+        self.text = ""
+        return t
+
+
+def get_full_address(text):
+    geocoder_request = f"http://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba-98533de7710b&geocode={text}&format=json"
+
+    response = requests.get(geocoder_request)
+    if response:
+        json_response = response.json()
+        toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
+        toponym_index = \
+        toponym["boundedBy"]["Envelope"]
+        return toponym_index
+
+    else:
+        print("Ошибка выполнения запроса:")
+        print(geocoder_request)
+        print("Http статус:", response.status_code, "(", response.reason, ")")
+        return 0
