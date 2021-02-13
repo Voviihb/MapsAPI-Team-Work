@@ -16,8 +16,16 @@ map_params = {
         "l": map_type
 }
 
+map_params2 = {
+    "ll": ",".join([coords[1], coords[0]]),
+    "spn": ",".join([spn, spn]),
+    "l": map_type
+}
+
 
 map_api_server = "http://static-maps.yandex.ru/1.x/"
+response = requests.get(map_api_server, params=map_params)
+
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
 background_scheme_button = Button(170, 60, screen, pygame, active_clr=(255, 0, 0))
@@ -58,26 +66,6 @@ while running:
     address_input_box.update()
     address_input_box.draw(screen)
 
-    map_params = {
-        "ll": ",".join([coords[1], coords[0]]),
-        "spn": ",".join([spn, spn]),
-        "l": map_type,
-    }
-    if x:
-        map_params["pt"] = f"{y},{x},org"
-    #print(coords, spn)
-    response = requests.get(map_api_server, params=map_params)
-    if not response:
-        print("Ошибка выполнения запроса:")
-        print(response.url)
-        print("Http статус:", response.status_code, "(", response.reason, ")")
-        sys.exit(1)
-
-    map_file = "map.png"
-    with open(map_file, "wb") as file:
-        file.write(response.content)
-
-    screen.blit(pygame.image.load(map_file), (0, 0))
     if background_scheme_button.draw((620, 20), "Схема"):
         map_type = "map"
     if background_sputnik_button.draw((620, 100), "Спутник"):
@@ -86,11 +74,9 @@ while running:
         map_type = "sat,skl"
     if search_button.draw((5, 500), "Искать!"):
         address = address_input_box.return_text()
-        #print(address)
         r = get_full_address(address)
         x = (float(r["lowerCorner"].split()[1]) + float(r["upperCorner"].split()[1])) / 2
         y = (float(r["lowerCorner"].split()[0]) + float(r["upperCorner"].split()[0])) / 2
-        print(x, y, r)
         coords = [str(x), str(y)]
         map_params = {
             "ll": ",".join([str(y), str(x)]),
@@ -98,6 +84,31 @@ while running:
             "l": map_type,
             "pt": f"{y},{x},org"
         }
+
+    map_params2 = {
+        "ll": ",".join([coords[1], coords[0]]),
+        "spn": ",".join([spn, spn]),
+        "l": map_type,
+    }
+    if x:
+        map_params2["pt"] = f"{y},{x},org"
+        map_params["pt"] = f"{y},{x},org"
+        response = requests.get(map_api_server, params=map_params)
+
+    if map_params != map_params2:
+        map_params = map_params2
+        response = requests.get(map_api_server, params=map_params)
+        if not response:
+            print("Ошибка выполнения запроса:")
+            print(response.url)
+            print("Http статус:", response.status_code, "(", response.reason, ")")
+            sys.exit(1)
+
+    map_file = "map.png"
+    with open(map_file, "wb") as file:
+        file.write(response.content)
+
+    screen.blit(pygame.image.load(map_file), (0, 0))
 
     pygame.display.flip()
 
