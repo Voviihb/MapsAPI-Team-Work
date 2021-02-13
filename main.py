@@ -122,7 +122,7 @@ while running:
         file.write(response.content)
 
     screen.blit(pygame.image.load(map_file), (0, 0))
-    print_text(full_address, 5, 570, screen, pygame)
+    print_text(full_address, 5, 570, screen, pygame, font_size=12)
 
     pygame.display.flip()
 
