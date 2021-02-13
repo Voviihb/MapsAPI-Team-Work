@@ -142,9 +142,10 @@ def get_full_address(text):
     if response:
         json_response = response.json()
         toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
-        toponym_index = toponym["boundedBy"]["Envelope"]
+        toponym_coords = toponym["boundedBy"]["Envelope"]
         full_address = toponym["metaDataProperty"]["GeocoderMetaData"]["text"]
-        return [toponym_index, full_address]
+        toponym_index = toponym["metaDataProperty"]["GeocoderMetaData"]["AddressDetails"]["Country"]["AdministrativeArea"]["Locality"]["Thoroughfare"]["Premise"]["PostalCode"]["PostalCodeNumber"]
+        return [toponym_coords, full_address, toponym_index]
 
     else:
         print("Ошибка выполнения запроса:")

@@ -5,6 +5,8 @@ import requests
 
 from addons import Button, InputBox, get_full_address, print_text
 
+clock = pygame.time.Clock()
+
 map_type = "map"
 #coords = input("Введите координаты в формате xxx yyy: ").split()
 coords = ["-28.069396", "34.457771"]
@@ -33,12 +35,15 @@ background_sputnik_button = Button(170, 60, screen, pygame, active_clr=(255, 0, 
 background_hybrid_button = Button(170, 60, screen, pygame, active_clr=(255, 0, 0))
 search_button = Button(170, 60, screen, pygame, active_clr=(255, 255, 0))
 reset_search_button = Button(170, 60, screen, pygame, active_clr=(255, 255, 0))
+index_on_button = Button(170, 60, screen, pygame, active_clr=(255, 255, 0))
 address_input_box = InputBox(pygame, 5, 460, 150, 32)
 address_input_box_done = False
 
 full_address = ""
 running = True
 x = y = 0
+index = ""
+index_on = False
 while running:
     screen.fill("black")
     for event in pygame.event.get():
@@ -68,6 +73,8 @@ while running:
     address_input_box.update()
     address_input_box.draw(screen)
 
+    if index_on_button.draw((400, 500), "Индекс"):
+        index_on = not index_on
     if background_scheme_button.draw((620, 20), "Схема"):
         map_type = "map"
     if background_sputnik_button.draw((620, 100), "Спутник"):
@@ -79,6 +86,7 @@ while running:
         address_and_coords = get_full_address(address)
         r = address_and_coords[0]
         full_address = address_and_coords[1]
+        index = address_and_coords[2]
         x = (float(r["lowerCorner"].split()[1]) + float(r["upperCorner"].split()[1])) / 2
         y = (float(r["lowerCorner"].split()[0]) + float(r["upperCorner"].split()[0])) / 2
         coords = [str(x), str(y)]
@@ -122,11 +130,12 @@ while running:
         file.write(response.content)
 
     screen.blit(pygame.image.load(map_file), (0, 0))
-    print_text(full_address, 5, 570, screen, pygame, font_size=12)
+    print_text(full_address + (" " + index if index_on and full_address else ""), 5, 570, screen, pygame, font_size=12)
 
     pygame.display.flip()
 
     os.remove(map_file)
+    clock.tick(60)
 
 pygame.quit()
 
