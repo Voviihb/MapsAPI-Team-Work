@@ -54,7 +54,7 @@ while running:
                 if abs(float(coords[0]) + 2 * float(spn)) < 90:
                     coords[0] = str(float(coords[0]) + 2 * float(spn))
             elif event.key == pygame.K_DOWN:
-                if abs(float(coords[0]) - 2 * float(spn)) < 90:
+                if abs(float(coords[0]) - 3 * float(spn)) < 90:
                     coords[0] = str(float(coords[0]) - 2 * float(spn))
             elif event.key == pygame.K_PAGEUP:
                 if 0 < float(spn) - 0.5 * float(spn) < 90:
@@ -78,7 +78,7 @@ while running:
         x = (float(r["lowerCorner"].split()[1]) + float(r["upperCorner"].split()[1])) / 2
         y = (float(r["lowerCorner"].split()[0]) + float(r["upperCorner"].split()[0])) / 2
         coords = [str(x), str(y)]
-        map_params = {
+        map_params2 = {
             "ll": ",".join([str(y), str(x)]),
             "spn": ",".join([spn, spn]),
             "l": map_type,
@@ -92,8 +92,9 @@ while running:
     }
     if x:
         map_params2["pt"] = f"{y},{x},org"
-        map_params["pt"] = f"{y},{x},org"
-        response = requests.get(map_api_server, params=map_params)
+        if "pt" not in map_params or map_params["pt"] != map_params2["pt"]:
+            map_params["pt"] = f"{y},{x},org"
+            response = requests.get(map_api_server, params=map_params)
 
     if map_params != map_params2:
         map_params = map_params2
