@@ -142,12 +142,27 @@ def get_full_address(text):
     if response:
         json_response = response.json()
         toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
-        toponym_index = \
-        toponym["boundedBy"]["Envelope"]
-        return toponym_index
+        toponym_index = toponym["boundedBy"]["Envelope"]
+        full_address = toponym["metaDataProperty"]["GeocoderMetaData"]["text"]
+        return [toponym_index, full_address]
 
     else:
         print("Ошибка выполнения запроса:")
         print(geocoder_request)
         print("Http статус:", response.status_code, "(", response.reason, ")")
         return 0
+
+
+def render_text(place, pygame, x=10, y=10, text="sample", scale=30, colour=(0, 255, 0)):
+    f1 = pygame.font.Font(None, scale)
+    text1 = f1.render(text, True, colour)
+    place.blit(text1, (x, y))
+
+
+def print_text(message, x, y, screen, pygame, font_size=30):
+    font = pygame.font.Font(None, font_size)
+    string_rendered = font.render(message, 1, pygame.Color('white'))
+    intro_rect = string_rendered.get_rect()
+    intro_rect.top = y
+    intro_rect.x = x
+    screen.blit(string_rendered, intro_rect)

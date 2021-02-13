@@ -3,7 +3,7 @@ import sys
 import pygame
 import requests
 
-from addons import Button, InputBox, get_full_address
+from addons import Button, InputBox, get_full_address, print_text
 
 map_type = "map"
 #coords = input("Введите координаты в формате xxx yyy: ").split()
@@ -36,6 +36,7 @@ reset_search_button = Button(170, 60, screen, pygame, active_clr=(255, 255, 0))
 address_input_box = InputBox(pygame, 5, 460, 150, 32)
 address_input_box_done = False
 
+full_address = ""
 running = True
 x = y = 0
 while running:
@@ -75,7 +76,9 @@ while running:
         map_type = "sat,skl"
     if search_button.draw((5, 500), "Искать!"):
         address = address_input_box.return_text()
-        r = get_full_address(address)
+        address_and_coords = get_full_address(address)
+        r = address_and_coords[0]
+        full_address = address_and_coords[1]
         x = (float(r["lowerCorner"].split()[1]) + float(r["upperCorner"].split()[1])) / 2
         y = (float(r["lowerCorner"].split()[0]) + float(r["upperCorner"].split()[0])) / 2
         coords = [str(x), str(y)]
@@ -86,10 +89,12 @@ while running:
             "pt": f"{y},{x},org"
         }
     if reset_search_button.draw((200, 500), "Сбросить"):
+        full_address = ""
         if x:
             map_params2.pop("pt", None)
             map_params.pop("pt", None)
             response = requests.get(map_api_server, params=map_params)
+
         x = y = 0
 
     map_params2 = {
@@ -117,6 +122,7 @@ while running:
         file.write(response.content)
 
     screen.blit(pygame.image.load(map_file), (0, 0))
+    print_text(full_address, 5, 570, screen, pygame)
 
     pygame.display.flip()
 
