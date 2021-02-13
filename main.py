@@ -32,6 +32,7 @@ background_scheme_button = Button(170, 60, screen, pygame, active_clr=(255, 0, 0
 background_sputnik_button = Button(170, 60, screen, pygame, active_clr=(255, 0, 0))
 background_hybrid_button = Button(170, 60, screen, pygame, active_clr=(255, 0, 0))
 search_button = Button(170, 60, screen, pygame, active_clr=(255, 255, 0))
+reset_search_button = Button(170, 60, screen, pygame, active_clr=(255, 255, 0))
 address_input_box = InputBox(pygame, 5, 460, 150, 32)
 address_input_box_done = False
 
@@ -84,6 +85,12 @@ while running:
             "l": map_type,
             "pt": f"{y},{x},org"
         }
+    if reset_search_button.draw((200, 500), "Сбросить"):
+        if x:
+            map_params2.pop("pt", None)
+            map_params.pop("pt", None)
+            response = requests.get(map_api_server, params=map_params)
+        x = y = 0
 
     map_params2 = {
         "ll": ",".join([coords[1], coords[0]]),
