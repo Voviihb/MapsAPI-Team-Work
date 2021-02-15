@@ -1,21 +1,21 @@
 import os
 import sys
 import pygame
-import requests
+import requests, math
 
-from addons import Button, InputBox, get_full_address, print_text
+from addons import Button, InputBox, get_full_address, print_text, lonlat_distance
 
 clock = pygame.time.Clock()
 
 map_type = "map"
-#coords = input("Введите координаты в формате xxx yyy: ").split()
+# coords = input("Введите координаты в формате xxx yyy: ").split()
 coords = ["-28.069396", "34.457771"]
 spn = "10"
-#spn = input("Введите значение параметра spn(масштаб): ")
+# spn = input("Введите значение параметра spn(масштаб): ")
 map_params = {
-        "ll": ",".join([coords[1], coords[0]]),
-        "spn": ",".join([spn, spn]),
-        "l": map_type
+    "ll": ",".join([coords[1], coords[0]]),
+    "spn": ",".join([spn, spn]),
+    "l": map_type
 }
 
 map_params2 = {
@@ -23,7 +23,6 @@ map_params2 = {
     "spn": ",".join([spn, spn]),
     "l": map_type
 }
-
 
 map_api_server = "http://static-maps.yandex.ru/1.x/"
 response = requests.get(map_api_server, params=map_params)
@@ -69,6 +68,35 @@ while running:
             elif event.key == pygame.K_PAGEDOWN:
                 if 0 < float(spn) + 0.5 * float(spn) < 90:
                     spn = str(float(spn) + 0.5 * float(spn))
+        elif pygame.mouse.get_pressed() == (1, 0, 0):
+            place = pygame.mouse.get_pos()
+            if place[0] <= 600 and place[1] <= 450:
+                deltax = float(spn) * (float((300 - place[0]) / 300))
+                coordsx = str(float(coords[1]) - deltax)
+                deltay = float(spn) * (float((225 - place[1]) / 225))
+                coordsy = str(float(coords[0]) + deltay)
+
+                radians_lattitude = math.radians((place[1] + coordsy) / 2.)
+                lat_lon_factor = math.cos(radians_lattitude)
+
+
+                prev = f"{coords[0]},{coords[1]}"
+                address = f"{coordsx},{coordsy}"
+                print(lonlat_distance(prev.split(","), address.split(",")))
+                address_and_coords = get_full_address(address)
+                r = address_and_coords[0]
+                full_address = address_and_coords[1]
+                index = address_and_coords[2]
+                x = (float(r["lowerCorner"].split()[1]) + float(r["upperCorner"].split()[1])) / 2
+                y = (float(r["lowerCorner"].split()[0]) + float(r["upperCorner"].split()[0])) / 2
+                coords = [str(x), str(y)]
+                map_params2 = {
+                    "ll": ",".join([str(y), str(x)]),
+                    "spn": ",".join([spn, spn]),
+                    "l": map_type,
+                    "pt": f"{y},{x},org"
+                }
+
 
     address_input_box.update()
     address_input_box.draw(screen)
@@ -138,6 +166,3 @@ while running:
     clock.tick(60)
 
 pygame.quit()
-
-
-

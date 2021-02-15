@@ -1,4 +1,4 @@
-import requests
+import requests, math, pprint
 
 
 def print_text_from_center(message, x, y, screen, pygame, font_size=30):
@@ -134,6 +134,24 @@ class InputBox:
         self.text = ""
         return t
 
+def lonlat_distance(a, b):
+    degree_to_meters_factor = 111 * 1000  # 111 километров в метрах
+    a_lon, a_lat = a
+    b_lon, b_lat = b
+    a_lon, a_lat = float(a_lon), float(a_lat)
+    b_lon, b_lat = float(b_lon), float(b_lat)
+
+    # Берем среднюю по широте точку и считаем коэффициент для нее.
+    radians_lattitude = math.radians((a_lat + b_lat) / 2.)
+    lat_lon_factor = math.cos(radians_lattitude)
+
+    # Вычисляем смещения в метрах по вертикали и горизонтали.
+    dx = (a_lon - b_lon) * lat_lon_factor
+    dy = (a_lat - b_lat)
+
+
+    return dx, dy
+
 
 def get_full_address(text):
     geocoder_request = f"http://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba-98533de7710b&geocode={text}&format=json"
@@ -141,10 +159,13 @@ def get_full_address(text):
     response = requests.get(geocoder_request)
     if response:
         json_response = response.json()
+        pprint.pprint(json_response)
         toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
+
         toponym_coords = toponym["boundedBy"]["Envelope"]
         full_address = toponym["metaDataProperty"]["GeocoderMetaData"]["text"]
-        toponym_index = toponym["metaDataProperty"]["GeocoderMetaData"]["AddressDetails"]["Country"]["AdministrativeArea"]["Locality"]["Thoroughfare"]["Premise"]["PostalCode"]["PostalCodeNumber"]
+        #toponym_index = toponym["metaDataProperty"]["GeocoderMetaData"]["AddressDetails"]["Country"]["AdministrativeArea"]["Locality"]["Thoroughfare"]["Premise"]["PostalCode"]["PostalCodeNumber"]
+        toponym_index = 0
         return [toponym_coords, full_address, toponym_index]
 
     else:
