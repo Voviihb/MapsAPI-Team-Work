@@ -68,39 +68,46 @@ while running:
             elif event.key == pygame.K_PAGEDOWN:
                 if 0 < float(spn) + 0.5 * float(spn) < 90:
                     spn = str(float(spn) + 0.5 * float(spn))
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                place = pygame.mouse.get_pos()
+                if place[0] <= 600 and place[1] <= 450:
+                    deltay = float(spn) * (float((225 - place[1]) / 225))
+                    print(deltay)
+                    coordsy = float(coords[0]) + deltay
 
-        # при нажатии левой кнопки мыши должно менять точку
-        elif pygame.mouse.get_pressed() == (1, 0, 0):
-            place = pygame.mouse.get_pos()
-            if place[0] <= 600 and place[1] <= 450:
-                deltax = float(spn) * (float((300 - place[0]) / 300))
-                coordsx = str(float(coords[1]) - deltax)
-                deltay = float(spn) * (float((225 - place[1]) / 225))
-                coordsy = str(float(coords[0]) + deltay)
+                    print(coordsy)
+                    deltax = float(spn) * (float((300 - place[0]) / 300))
+                    coordsx = float(coords[1]) - deltax
 
-                # в addons.py есть функция lonlat_distance. Она возвращает дистанцию в М между двумя точками.
-                # Наверное, как-нибудь ту формулу с косинусом можно переделать. Я попытался сам, вышло не очень.
-                # Поэтому вернул функцию в изначальное состояние.
-                # https://lyceum.yandex.ru/courses/352/groups/2470/lessons/2043/tasks/14594/solutions/5675999
-                # задача с оригинальной функцией
+                    coordsx = coordsx - (abs(coordsy) / 90.0) * deltax
+                    print((abs(coordsy) / 90.0), coordsx)
+                    coordsy = coordsy - (abs(coordsy) / 90.0)
+                    print((abs(coordsy) / 90.0), coordsy)
+                    coordsx, coordsy = str(coordsx), str(coordsy)
 
+                    # в addons.py есть функция lonlat_distance. Она возвращает дистанцию в М между двумя точками.
+                    # Наверное, как-нибудь ту формулу с косинусом можно переделать. Я попытался сам, вышло не очень.
+                    # Поэтому вернул функцию в изначальное состояние.
+                    # https://lyceum.yandex.ru/courses/352/groups/2470/lessons/2043/tasks/14594/solutions/5675999
+                    # задача с оригинальной функцией
 
-                # p.s. нужно отключить изменение положения карты. Так написанно в задаче
-                prev = f"{coords[0]},{coords[1]}"
-                address = f"{coordsx},{coordsy}"
-                address_and_coords = get_full_address(address)
-                r = address_and_coords[0]
-                full_address = address_and_coords[1]
-                index = address_and_coords[2]
-                x = (float(r["lowerCorner"].split()[1]) + float(r["upperCorner"].split()[1])) / 2
-                y = (float(r["lowerCorner"].split()[0]) + float(r["upperCorner"].split()[0])) / 2
-                coords = [str(x), str(y)]
-                map_params2 = {
-                    "ll": ",".join([str(y), str(x)]),
-                    "spn": ",".join([spn, spn]),
-                    "l": map_type,
-                    "pt": f"{y},{x},org"
-                }
+                    # p.s. нужно отключить изменение положения карты. Так написанно в задаче
+                    prev = f"{coords[0]},{coords[1]}"
+                    address = f"{coordsx},{coordsy}"
+                    address_and_coords = get_full_address(address)
+                    r = address_and_coords[0]
+                    full_address = address_and_coords[1]
+                    index = address_and_coords[2]
+                    x = (float(r["lowerCorner"].split()[1]) + float(r["upperCorner"].split()[1])) / 2
+                    y = (float(r["lowerCorner"].split()[0]) + float(r["upperCorner"].split()[0])) / 2
+                    coords = [str(x), str(y)]
+                    map_params2 = {
+                        "ll": ",".join([str(y), str(x)]),
+                        "spn": ",".join([spn, spn]),
+                        "l": map_type,
+                        "pt": f"{y},{x},org"
+                    }
 
 
     address_input_box.update()

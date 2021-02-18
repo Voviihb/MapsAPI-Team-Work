@@ -159,7 +159,7 @@ def get_full_address(text):
     response = requests.get(geocoder_request)
     if response:
         json_response = response.json()
-        pprint.pprint(json_response)
+        #pprint.pprint(json_response)
         toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
 
         toponym_coords = toponym["boundedBy"]["Envelope"]
