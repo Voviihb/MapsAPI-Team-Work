@@ -82,20 +82,21 @@ while running:
     if background_hybrid_button.draw((620, 180), "Гибрид"):
         map_type = "sat,skl"
     if search_button.draw((5, 500), "Искать!"):
-        address = address_input_box.return_text()
-        address_and_coords = get_full_address(address)
-        r = address_and_coords[0]
-        full_address = address_and_coords[1]
-        index = address_and_coords[2]
-        x = (float(r["lowerCorner"].split()[1]) + float(r["upperCorner"].split()[1])) / 2
-        y = (float(r["lowerCorner"].split()[0]) + float(r["upperCorner"].split()[0])) / 2
-        coords = [str(x), str(y)]
-        map_params2 = {
-            "ll": ",".join([str(y), str(x)]),
-            "spn": ",".join([spn, spn]),
-            "l": map_type,
-            "pt": f"{y},{x},org"
-        }
+        address = address_input_box.return_text()        if address:
+            address_and_coords = get_full_address(address)
+            if address_and_coords:
+                r = address_and_coords[0]
+                full_address = address_and_coords[1]
+                index = address_and_coords[2]
+                x = (float(r["lowerCorner"].split()[1]) + float(r["upperCorner"].split()[1])) / 2
+                y = (float(r["lowerCorner"].split()[0]) + float(r["upperCorner"].split()[0])) / 2
+                coords = [str(x), str(y)]
+                map_params2 = {
+                    "ll": ",".join([str(y), str(x)]),
+                    "spn": ",".join([spn, spn]),
+                    "l": map_type,
+                    "pt": f"{y},{x},org"
+                }
     if reset_search_button.draw((200, 500), "Сбросить"):
         full_address = ""
         if x:
@@ -138,6 +139,3 @@ while running:
     clock.tick(60)
 
 pygame.quit()
-
-
-
