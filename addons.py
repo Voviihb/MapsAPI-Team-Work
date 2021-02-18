@@ -72,7 +72,10 @@ class Button:
                 else:
                     self.current_clr[i] = max(self.active_clr[i], self.current_clr[i] + self.diff_clr[i])
             if click[0] == 1:
-                return True
+                if self.last_ret:
+                    return False
+                self.last_ret = True
+                return self.last_ret
             else:
                 self.last_ret = False
         else:
