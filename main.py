@@ -68,6 +68,8 @@ while running:
             elif event.key == pygame.K_PAGEDOWN:
                 if 0 < float(spn) + 0.5 * float(spn) < 90:
                     spn = str(float(spn) + 0.5 * float(spn))
+
+        # при нажатии левой кнопки мыши должно менять точку
         elif pygame.mouse.get_pressed() == (1, 0, 0):
             place = pygame.mouse.get_pos()
             if place[0] <= 600 and place[1] <= 450:
@@ -76,13 +78,16 @@ while running:
                 deltay = float(spn) * (float((225 - place[1]) / 225))
                 coordsy = str(float(coords[0]) + deltay)
 
-                radians_lattitude = math.radians((place[1] + coordsy) / 2.)
-                lat_lon_factor = math.cos(radians_lattitude)
+                # в addons.py есть функция lonlat_distance. Она возвращает дистанцию в М между двумя точками.
+                # Наверное, как-нибудь ту формулу с косинусом можно переделать. Я попытался сам, вышло не очень.
+                # Поэтому вернул функцию в изначальное состояние.
+                # https://lyceum.yandex.ru/courses/352/groups/2470/lessons/2043/tasks/14594/solutions/5675999
+                # задача с оригинальной функцией
 
 
+                # p.s. нужно отключить изменение положения карты. Так написанно в задаче
                 prev = f"{coords[0]},{coords[1]}"
                 address = f"{coordsx},{coordsy}"
-                print(lonlat_distance(prev.split(","), address.split(",")))
                 address_and_coords = get_full_address(address)
                 r = address_and_coords[0]
                 full_address = address_and_coords[1]
